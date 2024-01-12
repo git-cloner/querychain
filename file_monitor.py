@@ -4,6 +4,7 @@ import time
 import queue
 import threading
 from config import base_dir
+import os
 
 file_monitor_queue = queue.Queue()
 
@@ -17,6 +18,8 @@ class MyHandler(FileSystemEventHandler):
 
 
 def start_watchdog():
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir)
     event_handler = MyHandler()
     observer = Observer()
     observer.schedule(event_handler, base_dir, recursive=True)
