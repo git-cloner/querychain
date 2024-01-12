@@ -110,7 +110,5 @@ if __name__ == "__main__":
         length_function=len,
     )
     splitdocs = text_splitter.split_documents(documents)
-    for doc in splitdocs:
-        print(doc.page_content)
     for i, doc in enumerate(splitdocs):
         print(f'doc #{i}: {doc.page_content}')
