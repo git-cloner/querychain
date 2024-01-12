@@ -40,11 +40,21 @@ npm i
 npm start
 ```
 
-## 4、测试
+## 4、测试客户端
 
 http://localhost:3000
 
-## 5、API调用说明
+## 5、知识库操作
+
+### （1）增加知识库文件
+
+将docx、txt、md、pdf等文件复制到documents目录下即可，程序会监控文件夹变化，定时将新文件内容分块存入知识库。
+
+### （2）重新生成知识库
+
+python main.py --reindex
+
+## 6、API调用说明
 
 使用OpenAI兼容接口/v1/chat/completions调用，以下代码适用于node.js、react.js、vue等，其他语言可参照openai的接口调用SDK说明。
 
