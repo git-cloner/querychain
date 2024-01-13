@@ -57,3 +57,8 @@
   border-radius: 12px;
   margin-left: 2.5rem;
 }
+
+.Message.left .Bubble {
+  margin-right: 3rem;
+  max-width: max-content;
+}

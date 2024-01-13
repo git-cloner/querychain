@@ -1,6 +1,6 @@
 {
   "name": "chat-app",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "proxy": "http://172.16.62.137:8001",
   "dependencies": {

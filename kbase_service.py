@@ -102,6 +102,7 @@ def answer_from_llm(llm, matching_docs, query):
     answer = chain.run(input_documents=matching_docs, question=query)
     return answer
 
+
 def llm_chat_stream(query):
     messages = [
         {
@@ -121,6 +122,7 @@ def llm_chat_stream(query):
         temperature=0.8,
         presence_penalty=1.1,
         top_p=0.8)
+
 
 def yield_Context(model_id, new_content):
     choice_data = ChatCompletionResponseStreamChoice(
@@ -174,10 +176,18 @@ def predict(query: str, history: List[List[str]], model_id: str):
     # push content chunk
     matching_docs = search_docs(query)
     if (len(matching_docs) > 0):
-        # answer from vector_db
-        new_text = matching_docs[0].page_content + "[" + \
-            matching_docs[0].metadata["source"] + \
-            "]" + "\n\n" + "以下为大语言模型的返回结果：\n\n"
+        # answer from vector_db top 5
+        i = 0
+        for doc in matching_docs:
+            i = i + 1
+            if i > 5:
+                break
+            new_text = "[" + str(i) + "]" + doc.page_content + \
+                "[" + doc.metadata["source"] + "]" + "\n\n"
+            chunk = predict_chunk_content(model_id, new_text)
+            yield "{}".format(chunk.model_dump_json(exclude_unset=True))
+        # answer prepare from llm
+        new_text = "以下为大语言模型的返回结果：\n\n"
         chunk = predict_chunk_content(model_id, new_text)
         yield "{}".format(chunk.model_dump_json(exclude_unset=True))
         # answer from llm
@@ -189,14 +199,14 @@ def predict(query: str, history: List[List[str]], model_id: str):
             chunk = predict_chunk_content(model_id, new_token)
             yield "{}".format(chunk.model_dump_json(exclude_unset=True))
             time.sleep(0.05)
-    else :
+    else:
         response = llm_chat_stream(query)
-        if response :
+        if response:
             for _chunk in response:
                 new_token = _chunk.choices[0].delta.content
                 chunk = predict_chunk_content(model_id, new_token)
                 yield "{}".format(chunk.model_dump_json(exclude_unset=True))
-                
+
     # push stop chunk
     chunk = predict_chunk_stop(model_id)
     yield "{}".format(chunk.model_dump_json(exclude_unset=True))
