@@ -48,6 +48,17 @@ class PolicyDocLoader(BaseLoader):
             documents[0].page_content, ext)
         return documents
 
+    def load_and_split(self):
+        documents = self.load()
+        # split document
+        text_splitter = PolicyDocSplitter(
+            separator="\n\n",
+            chunk_size=512,
+            chunk_overlap=100,
+            length_function=len,
+        )
+        return text_splitter.split_documents(documents)
+
 
 class PolicyDocSplitter(CharacterTextSplitter):
     def split_text(this, document: str, ext: str) -> list:
@@ -101,14 +112,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     # load document
     loader = PolicyDocLoader(args.file)
-    documents = loader.load()
-    # split document
-    text_splitter = PolicyDocSplitter(
-        separator="\n\n",
-        chunk_size=512,
-        chunk_overlap=100,
-        length_function=len,
-    )
-    splitdocs = text_splitter.split_documents(documents)
+    splitdocs = loader.load_and_split()
     for i, doc in enumerate(splitdocs):
         print(f'doc #{i}: {doc.page_content}')
