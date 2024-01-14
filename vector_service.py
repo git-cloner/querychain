@@ -11,9 +11,11 @@ from file_monitor import file_monitor_queue
 import sys
 import os
 from tqdm import tqdm
-from config import base_dir, index_dir, embedding_model,splitter
-from common_splitter import CommonDocLoader
-from policy_splitter import PolicyDocLoader
+from config import base_dir, index_dir, embedding_model
+from splitters.commonchs_splitter import CommonchsDocLoader
+from splitters.common_splitter import CommonDocLoader
+from splitters.policy_splitter import PolicyDocLoader
+from splitters.spitter_group import getSpitterGroup
 
 indexing_flag = False
 vectordb_search = None
@@ -27,12 +29,14 @@ def get_all_files(directory):
     return files
 
 
-def load_and_split(filename):
+def load_and_split(filename, splitter):
     loader = None
-    if splitter == "POLICY" :
+    if splitter == "POLICY":
         loader = PolicyDocLoader(filename)
-    else :
+    elif splitter == "COMMON":
         loader = CommonDocLoader(filename)
+    else:
+        loader = CommonchsDocLoader(filename)
     return loader.load_and_split()
 
 
@@ -74,7 +78,7 @@ def recreate_vector_db():
     directory = base_dir
     files = get_all_files(directory)
     progress = tqdm(total=len(files))
-    for _filename in files :
+    for _filename in files:
         _tmp = os.path.basename(_filename)
         progress.set_description(f"{_tmp}")
         adddoc_to_vector_db(_filename)
@@ -85,10 +89,11 @@ def recreate_vector_db():
 def adddoc_to_vector_db(filename):
     if not os.path.exists(filename):
         return
-    if filename.startswith("~") :
+    if filename.startswith("~"):
         return
     try:
-        split_docs = load_and_split(filename)
+        splitter = getSpitterGroup(filename)
+        split_docs = load_and_split(filename, splitter)
         if len(split_docs) > 0:
             vectordb = create_vectorstore(split_docs)
             vectordb.persist()

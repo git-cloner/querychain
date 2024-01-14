@@ -8,7 +8,7 @@ from langchain_community.docstore.document import Document
 from langchain.text_splitter import CharacterTextSplitter
 
 
-class PolicyDocLoader(BaseLoader):
+class CommonchsDocLoader(BaseLoader):
     def load_docs_from_file(self, filename):
         loader = UnstructuredFileLoader(filename)
         documents = loader.load()
@@ -21,11 +21,8 @@ class PolicyDocLoader(BaseLoader):
         document = re.sub(r'－\d+－', '', document)
         document = re.sub(r'— \d+ —', '', document)
         document = re.sub(r'\d+ -', '', document)
-        # 在第XX章、第XX条、第XX节前面加一个分块符<chunk>
-        if ext == "pdf":
-            pattern = r'(第[\u4e00-\u9fa5\d]{1,20}章 |第[\u4e00-\u9fa5\d]{1,20}条 |第[\u4e00-\u9fa5\d]{1,20}节 )'
-        else:
-            pattern = r'(第[\u4e00-\u9fa5\d]{1,20}章[\u3000]|第[\u4e00-\u9fa5\d]{1,20}条[\u3000]|第[\u4e00-\u9fa5\d]{1,20}节[\u3000])'
+        # 在第XX章、句号前面加一个分块符<chunk>
+        pattern = r'(第[\u4e00-\u9fa5\d]{1,20}章|。)'
         replacement = r'<chunk>\1'
         document = re.sub(pattern, replacement, document)
         # 返回结果
@@ -51,7 +48,7 @@ class PolicyDocLoader(BaseLoader):
     def load_and_split(self):
         documents = self.load()
         # split document
-        text_splitter = PolicyDocSplitter(
+        text_splitter = CommonchsDocSplitter(
             separator="\n\n",
             chunk_size=512,
             chunk_overlap=100,
@@ -60,7 +57,7 @@ class PolicyDocLoader(BaseLoader):
         return text_splitter.split_documents(documents)
 
 
-class PolicyDocSplitter(CharacterTextSplitter):
+class CommonchsDocSplitter(CharacterTextSplitter):
     def split_text(this, document: str, ext: str) -> list:
         chunks = document.split("<chunk>")
         if ext == "pdf":
@@ -100,18 +97,13 @@ class PolicyDocSplitter(CharacterTextSplitter):
         return self.create_documents(texts, metadatas=metadatas)
 
 
-# python policy_splitter.py --file .\data\相关法律法规\2.中华人民共和国食品安全法.docx
-# python policy_splitter.py --file .\data\相关法律法规\食品添加剂生产企业卫生规范.docx
-# python policy_splitter.py --file .\data\相关法律法规\市场监管行业标准管理办法.pdf
-# python policy_splitter.py --file .\data\相关法律法规\中华人民共和国反垄断法.pdf
-# python policy_splitter.py --file .\data\相关法律法规\中华人民共和国价格管理条例.pdf
-# python policy_splitter.py --file .\data\相关法律法规\中华人民共和国市场主体登记管理条例.docx
+# python commonchs_splitter.py --file .\documents\其他文件\低算力条件下GPT应用开发2024.1.5.docx
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', type=str, required=True)
     args = parser.parse_args()
     # load document
-    loader = PolicyDocLoader(args.file)
+    loader = CommonchsDocLoader(args.file)
     splitdocs = loader.load_and_split()
     for i, doc in enumerate(splitdocs):
         print(f'doc #{i}: {doc.page_content}')
