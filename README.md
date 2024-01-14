@@ -101,3 +101,21 @@ async function chat_stream(prompt) {
 
 ```
 
+## 7、nginx sse配置
+
+如果API服务使用了nginx代理，会出现nginx缓冲sse流的问题，导致的现象是客户端调用sse接口时，流数据并不是按流式一条一条出现的，而是最后一次性返回，原因是nginx网关对流数据进行了缓存，可按以下配置解决。
+
+```bash
+location /v1 {
+  proxy_http_version 1.1;
+  proxy_set_header Connection "";
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header Host $host;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_read_timeout 86400s;
+  proxy_buffering off;
+  proxy_cache off;
+  proxy_pass http://127.0.0.1:8060/v1/ ;
+}
+```
+
