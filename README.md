@@ -24,8 +24,16 @@ python tools/model_download.py --repo_id shibing624/text2vec-base-chinese
 
 ```shell
 conda activate qchain
+# 首次运行程序要注意以下两个问题
+# （1） 程序会下载tokenizers/punkt，时间比较长
+# 如果时间太长，可尝试以下方法：
+# python
+# >>> import nltk
+# >>> nltk.download('punkt')
+# >>> exit()
+# （2） 需要安装jvm
+# .docx文件解析器需要jvm，比如在unbutu上，sudo apt-get install default-jdk
 # 方式一：正常运行，装载已生成的向量库（库文件在indexs目录下）
-# 首次运行程序会下载tokenizers/punkt，时间比较长
 python qchain.py
 # 方式二：重建向量库，删除indexs目录，重新生成向量库
 python qchain.py --reindex
