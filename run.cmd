@@ -1,2 +1,2 @@
 call conda activate qchain
-call python main.py
+call python qchain.py

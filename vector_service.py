@@ -57,7 +57,7 @@ def load_vectorstore():
 
 
 def search_docs(query):
-    matching_docs = vectordb_search.similarity_search(query)
+    matching_docs = vectordb_search.similarity_search_with_score(query)
     return matching_docs
 
 

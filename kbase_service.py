@@ -6,7 +6,7 @@ from langchain.schema import LLMResult
 from sse_starlette.sse import ServerSentEvent, EventSourceResponse
 import time
 import os
-from config import openid_base_url, llm_model_id
+from config import openid_base_url, llm_model_id, query_score_limit
 from vector_service import search_docs
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains.question_answering import load_qa_chain
@@ -175,6 +175,7 @@ def predict(query: str, history: List[List[str]], model_id: str):
     yield "{}".format(chunk.model_dump_json(exclude_unset=True))
     # push content chunk
     matching_docs = search_docs(query)
+    kbase_hint_count = 0
     if (len(matching_docs) > 0):
         # answer from vector_db top 5
         i = 0
@@ -182,24 +183,31 @@ def predict(query: str, history: List[List[str]], model_id: str):
             i = i + 1
             if i > 5:
                 break
-            new_text = "[" + str(i) + "]" + doc.page_content + \
-                "[" + doc.metadata["source"] + "]" + "\n\n"
-            chunk = predict_chunk_content(model_id, new_text)
-            yield "{}".format(chunk.model_dump_json(exclude_unset=True))
+            if doc[1] < query_score_limit:
+                kbase_hint_count = kbase_hint_count + 1
+                new_text = "[" + str(i) + "]" + doc[0].page_content + \
+                    "[" + doc[0].metadata["source"] + "]" + "\n\n"
+                chunk = predict_chunk_content(model_id, new_text)
+                yield "{}".format(chunk.model_dump_json(exclude_unset=True))
         # answer prepare from llm
-        new_text = "以下为大语言模型的返回结果：\n\n"
+        if kbase_hint_count == 0:
+            new_text = "知识库未命中，以下为大语言模型的返回结果：\n\n"
+        else:
+            new_text = "大语言模型总结结果：\n\n"
         chunk = predict_chunk_content(model_id, new_text)
         yield "{}".format(chunk.model_dump_json(exclude_unset=True))
         # answer from llm
-        answer_from_llm(llm, matching_docs, query)
-        while True:
-            new_token = chatOpenAICustomSyncHandler.get_tokens()
-            if new_token == "[DONE]":
-                break
-            chunk = predict_chunk_content(model_id, new_token)
-            yield "{}".format(chunk.model_dump_json(exclude_unset=True))
-            time.sleep(0.05)
-    else:
+        if kbase_hint_count > 0:
+            matching_docs1 = [item[0] for item in matching_docs]
+            answer_from_llm(llm, matching_docs1, query)
+            while True:
+                new_token = chatOpenAICustomSyncHandler.get_tokens()
+                if new_token == "[DONE]":
+                    break
+                chunk = predict_chunk_content(model_id, new_token)
+                yield "{}".format(chunk.model_dump_json(exclude_unset=True))
+                time.sleep(0.05)
+    if kbase_hint_count == 0:
         response = llm_chat_stream(query)
         if response:
             for _chunk in response:
