@@ -25,10 +25,12 @@ python tools/model_download.py --repo_id shibing624/text2vec-base-chinese
 ```shell
 conda activate qchain
 # 方式一：正常运行，装载已生成的向量库（库文件在indexs目录下）
+# 首次运行程序会下载tokenizers/punkt，时间比较长
 python qchain.py
 # 方式二：重建向量库，删除indexs目录，重新生成向量库
 python qchain.py --reindex
 # Linux上后台运行
+pkill -f -9 qchain
 nohup python -u qchain.py > qchain.log 2>&1 &
 tail -f qchain.log
 ```
