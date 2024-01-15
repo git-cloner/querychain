@@ -100,12 +100,12 @@ class PolicyDocSplitter(CharacterTextSplitter):
         return self.create_documents(texts, metadatas=metadatas)
 
 
-# python policy_splitter.py --file .\documents\相关法律法规\2.中华人民共和国食品安全法.docx
-# python policy_splitter.py --file .\documents\相关法律法规\食品添加剂生产企业卫生规范.docx
-# python policy_splitter.py --file .\documents\相关法律法规\市场监管行业标准管理办法.pdf
-# python policy_splitter.py --file .\documents\相关法律法规\中华人民共和国反垄断法.pdf
-# python policy_splitter.py --file .\documents\相关法律法规\中华人民共和国价格管理条例.pdf
-# python policy_splitter.py --file .\documents\相关法律法规\中华人民共和国市场主体登记管理条例.docx
+# python splitters/policy_splitter.py --file .\documents\相关法律法规\2.中华人民共和国食品安全法.docx
+# python splitters/policy_splitter.py --file .\documents\相关法律法规\食品添加剂生产企业卫生规范.docx
+# python splitters/policy_splitter.py --file .\documents\相关法律法规\市场监管行业标准管理办法.pdf
+# python splitters/policy_splitter.py --file .\documents\相关法律法规\中华人民共和国反垄断法.pdf
+# python splitters/policy_splitter.py --file .\documents\相关法律法规\中华人民共和国价格管理条例.pdf
+# python splitters/policy_splitter.py --file .\documents\相关法律法规\中华人民共和国市场主体登记管理条例.docx
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', type=str, required=True)

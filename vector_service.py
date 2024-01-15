@@ -15,6 +15,7 @@ from config import base_dir, index_dir, embedding_model
 from splitters.commonchs_splitter import CommonchsDocLoader
 from splitters.common_splitter import CommonDocLoader
 from splitters.policy_splitter import PolicyDocLoader
+from splitters.json_splitter import JSONLoader
 from splitters.spitter_group import getSpitterGroup
 
 indexing_flag = False
@@ -35,6 +36,8 @@ def load_and_split(filename, splitter):
         loader = PolicyDocLoader(filename)
     elif splitter == "COMMON":
         loader = CommonDocLoader(filename)
+    elif splitter == "JSON":
+        loader = JSONLoader(filename,"q","a")
     else:
         loader = CommonchsDocLoader(filename)
     return loader.load_and_split()

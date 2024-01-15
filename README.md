@@ -59,9 +59,26 @@ http://localhost:3000
 
 ### （1）增加知识库文件
 
-将docx、txt、md、pdf等文件复制到documents目录下即可，程序会监控文件夹变化，定时将新文件内容分块存入知识库。
+将docx、txt、md、pdf、json等文件复制到documents目录下即可，程序会监控文件夹变化，定时将新文件内容分块存入知识库。
 
-### （2）重新生成知识库
+### （2）JSON格式文件说明
+
+文件整理成以下格式，也可以不是q和a节点，在代码中loader = JSONLoader(filename,"q","a")修改。这样写入知识库里用q做Embedding，用a做metadata，检索时用q匹配问题，用a显示答案。
+
+```json
+[
+    {
+        "q":"问题1？",
+        "a":"答案1。"
+    },
+    {
+        "q":"问题2？",
+        "a":"答案2。"
+    }
+]
+```
+
+### （3）重新生成知识库
 
 python qchain.py --reindex
 

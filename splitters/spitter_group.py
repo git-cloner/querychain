@@ -10,6 +10,8 @@ def calculate_chinese_percentage(text):
 
 
 def getSpitterGroup(filename):
+    if ".json" in filename.lower():
+        return "JSON"
     loader = UnstructuredFileLoader(filename)
     documents = loader.load()
     content = documents[0].page_content
