@@ -23,7 +23,6 @@ python tools/model_download.py --repo_id shibing624/text2vec-base-chinese
 ## 2、运行服务器端
 
 ```shell
-conda activate qchain
 # 首次运行程序要注意以下两个问题
 # （1） 程序会下载tokenizers/punkt，时间比较长
 # 如果时间太长，可尝试以下方法：
@@ -34,6 +33,7 @@ conda activate qchain
 # （2） 需要安装jvm
 # .docx文件解析器需要jvm，比如在unbutu上，sudo apt-get install default-jdk
 # 方式一：正常运行，装载已生成的向量库（库文件在indexs目录下）
+conda activate qchain
 python qchain.py
 # 方式二：重建向量库，删除indexs目录，重新生成向量库
 python qchain.py --reindex
@@ -67,7 +67,7 @@ python qchain.py --reindex
 
 ## 6、API调用说明
 
-使用OpenAI兼容接口/v1/chat/completions调用，以下代码适用于node.js、react.js、vue等，其他语言可参照openai的接口调用SDK说明。
+使用OpenAI兼容接口/v1/chat/completions调用，是一种sse（Server-Send Events，服务器端推流）模式，以下代码适用于node.js、react.js、vue等，其他语言可参照openai的接口调用SDK说明。
 
 使用前先用npm i opanai安装依赖包
 
@@ -97,13 +97,11 @@ async function chat_stream(prompt) {
     }
     message_history.push({ "role": "assistant", "content": snapshot });
 }
-
-
 ```
 
 ## 7、nginx sse配置
 
-如果API服务使用了nginx代理，会出现nginx缓冲sse流的问题，导致的现象是客户端调用sse接口时，流数据并不是按流式一条一条出现的，而是最后一次性返回，原因是nginx网关对流数据进行了缓存，可按以下配置解决。
+如果API服务使用了nginx代理，会出现nginx缓冲sse流的问题，导致的现象是客户端调用sse接口时，流数据并不是按流式一条一条出现的，而是最后一次性返回，原因是nginx网关对流数据进行了缓存，可按以下配置解决，如果经过了多道nginx转发，则每个nginx都需要配置。
 
 ```bash
 location /v1 {

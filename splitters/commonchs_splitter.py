@@ -21,9 +21,13 @@ class CommonchsDocLoader(BaseLoader):
         document = re.sub(r'－\d+－', '', document)
         document = re.sub(r'— \d+ —', '', document)
         document = re.sub(r'\d+ -', '', document)
-        # 在第XX章、句号前面加一个分块符<chunk>
-        pattern = r'(第[\u4e00-\u9fa5\d]{1,20}章|。)'
+        # 在第XX章前加分块符<chunk>
+        pattern = r'(第[\u4e00-\u9fa5\d]{1,20}章)'
         replacement = r'<chunk>\1'
+        document = re.sub(pattern, replacement, document)
+        # 句号后加分块符<chunk>
+        pattern = r'(。)'
+        replacement = r'\1<chunk>'
         document = re.sub(pattern, replacement, document)
         # 返回结果
         return document
@@ -97,7 +101,7 @@ class CommonchsDocSplitter(CharacterTextSplitter):
         return self.create_documents(texts, metadatas=metadatas)
 
 
-# python commonchs_splitter.py --file .\documents\其他文件\低算力条件下GPT应用开发2024.1.5.docx
+# python splitters/commonchs_splitter.py --file .\documents\其他文件\低算力条件下GPT应用开发2024.1.5.docx
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', type=str, required=True)
