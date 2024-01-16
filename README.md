@@ -19,11 +19,25 @@ QueryChain是基于langchain的本地知识库+大语言模型的参考实现，
 ## 1、服务器端环境安装
 
 ```bash
+# （1）新建python环境
 conda create -n qchain python=3.10 -y
 conda activate qchain 
-# 安装依赖包
+# （2）安装依赖包
 pip install -r requirements.txt -i http://pypi.douban.com/simple --trusted-host=pypi.douban.com
-# 下载文本转向量模型
+# （3）如果在Windows上，默认装的是cpu版的torch，需要重装成GPU版的
+# 验证
+在python提示符下，运行
+import torch
+print(torch.__version__)
+print(torch.cuda.is_available())
+# 如果是CPU版的，需要从网站上找到命令安装
+pip uninstall torch -y 
+pip uninstall torchvision -y
+# cuda 12.2
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# cuda 11.7
+pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 -i http://pypi.douban.com/simple --trusted-host=pypi.douban.com
+# （4） 下载文本转向量模型
 python tools/model_download.py --repo_id shibing624/text2vec-base-chinese
 ```
 
