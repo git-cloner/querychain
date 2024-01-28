@@ -12,3 +12,11 @@ gradio==4.13.0
 watchdog==3.0.0
 schedule==1.2.1
 sse-starlette==1.8.2
+nest_asyncio==1.6.0
+torch==2.1.2
+tqdm==4.66.1
+transformers==4.37.1
+bs4==0.0.2
+sentencepiece==0.1.99
+sacremoses==0.1.1
+starlette==4.9.0
