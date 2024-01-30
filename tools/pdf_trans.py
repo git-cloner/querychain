@@ -67,6 +67,7 @@ def translate_html(pdf, html, llm, clientid, fn):
     divs = soup.find_all('div', class_="t")
     pbar = tqdm(total=len(divs))
     lines = []
+    special = [2,17]
     for div in divs:
         pbar.update(1)
         if fn is not None:
@@ -76,6 +77,10 @@ def translate_html(pdf, html, llm, clientid, fn):
         skip_flag = False
         for x in range(20, 51):
             if "m" + str(x) in div["class"]:
+                skip_flag = True
+                break
+        for sp in special:
+            if "ff" + str(sp) in div["class"]:
                 skip_flag = True
                 break
         if skip_flag:
