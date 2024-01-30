@@ -14,6 +14,8 @@ QueryChain是基于langchain的本地知识库+大语言模型的参考实现，
 
 - 文本分隔器自动适配：根据文档内容选择不同的文本分隔算法，如政策文件、一般中文和英文算法
 
+- pdf翻译：使用Helsinki-NLP/opus-mt-en-zh翻译模型和通用大语言模型翻译英文pdf文件
+
   ![](https://gitclone.com/download1/aiit/qchain.gif)
 
 ## 1、服务器端环境安装

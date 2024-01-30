@@ -8,7 +8,7 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 model = None
 tokenizer = None
-base_url = "http://172.16.62.137:8000/v1/"
+base_url = "http://127.0.0.1:8000/v1/"
 client = OpenAI(api_key="EMPTY", base_url=base_url)
 html_url = "http://127.0.0.1:8060/download/"
 
@@ -59,7 +59,7 @@ def translate_text_llm(text):
         return text
 
 
-def translate_pdf(pdf, html, llm, clientid, fn):
+def translate_html(pdf, html, llm, clientid, fn):
     print("开始翻译html")
     with open('output.html', 'r', encoding='utf-8') as file:
         soup = BeautifulSoup(file, 'html.parser')
@@ -117,7 +117,7 @@ def translate_pdf_html(pdf, html, llm, clientid, fn):
     if model is None:
         load_trans_model()
     if pdf2html(pdf, clientid, fn):
-        translate_pdf(pdf, html, llm, clientid, fn)
+        translate_html(pdf, html, llm, clientid, fn)
         return True
     else:
         return False
