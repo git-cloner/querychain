@@ -43,7 +43,27 @@ pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 -i http://pypi.do
 python tools/model_download.py --repo_id shibing624/text2vec-base-chinese
 ```
 
-## 2、运行服务器端
+## 2、URL配置
+
+### （1）服务器端
+
+```bash
+toos/pdf_trans.py有两处：
+1、base_url：指向大语言模型的服务地址，如http://172.16.62.137:8000/v1/
+2、html_url：客户端下载翻译后的html地址：如http://本机IP:8060/download/
+config.py
+openid_base_url:指向大语言模型的服务地址，如http://172.16.62.137:8000/v1
+```
+
+### （2）客户端
+
+```
+chat-app/src/app.js两处：
+1、知识库后台openai兼容接口的baseURL：如前后台在一台机器上设为http://127.0.0.1:8060/v1，前后端分离设为http://后台机器IP:8060/v1
+2、知识库后台websocket地址：如前后台在一台机器上设为http://127.0.0.1:8060/ws/，前后端分离设为http://后台机器IP:8060/ws/
+```
+
+## 3、运行服务器端
 
 ```shell
 # 首次运行程序要注意以下两个问题
@@ -64,9 +84,10 @@ python qchain.py --reindex
 pkill -f -9 qchain
 nohup python -u qchain.py > qchain.log 2>&1 &
 tail -f qchain.log
+# 如果用到pdf翻译功能，将tools/pdf2htmlEX.rar解压到querychain的根目录
 ```
 
-## 3、运行客户端
+## 4、运行客户端
 
 ```shell
 cd chat-app
@@ -74,11 +95,11 @@ npm i
 npm start
 ```
 
-## 4、测试客户端
+## 5、测试客户端
 
 http://localhost:3000
 
-## 5、知识库操作
+## 6、知识库操作
 
 ### （1）增加知识库文件
 
@@ -105,7 +126,7 @@ http://localhost:3000
 
 python qchain.py --reindex
 
-## 6、API调用说明
+## 7、API调用说明
 
 使用OpenAI兼容接口/v1/chat/completions调用，是一种sse（Server-Send Events，服务器端推流）模式，以下代码适用于node.js、react.js、vue等，其他语言可参照openai的接口调用SDK说明。
 
@@ -139,7 +160,7 @@ async function chat_stream(prompt) {
 }
 ```
 
-## 7、nginx sse配置
+## 8、nginx sse配置
 
 如果API服务使用了nginx代理，会出现nginx缓冲sse流的问题，导致的现象是客户端调用sse接口时，流数据并不是按流式一条一条出现的，而是最后一次性返回，原因是nginx网关对流数据进行了缓存，可按以下配置解决，如果经过了多道nginx转发，则每个nginx都需要配置。
 

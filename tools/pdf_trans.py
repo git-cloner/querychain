@@ -25,7 +25,7 @@ def load_trans_model():
 def translate_text(text):
     tokenized_text = tokenizer(
         text, return_tensors='pt', truncation=True, padding=True).to(device)
-    tokenized_text['repetition_penalty'] = 1.2
+    tokenized_text['repetition_penalty'] = 1.85
     translation = model.generate(**tokenized_text)
     translated_text = tokenizer.batch_decode(
         translation, skip_special_tokens=True)
@@ -35,12 +35,8 @@ def translate_text(text):
 def translate_text_llm(text):
     messages = [
         {
-            "role": "system",
-            "content": "你是一个人工智能翻译工具，请翻译用户给出的英文，只输出翻译的最终结果，如不能翻译，请原样输出",
-        },
-        {
             "role": "user",
-            "content": text
+            "content": "请翻译下列英文，直接给出结果，无法翻译的部分直接原样输出:" + text
         }
     ]
     response = client.chat.completions.create(
@@ -67,7 +63,7 @@ def translate_html(pdf, html, llm, clientid, fn):
     divs = soup.find_all('div', class_="t")
     pbar = tqdm(total=len(divs))
     lines = []
-    special = [2,17]
+    special = [2, 17]
     for div in divs:
         pbar.update(1)
         if fn is not None:
@@ -91,6 +87,10 @@ def translate_html(pdf, html, llm, clientid, fn):
         if text is not None and text != "" and len(text) > 5:
             if llm:
                 _text = translate_text_llm(text)
+                if _text == "(逗号)":
+                    _text = _text.replace("(逗号)", "")
+                    if "翻译" in _text or "原文" in _text or "无法" in _text or "拼写错误" in _text or "直译" in _text or "这段英文" in _text:
+                        _text = translate_text(text)
             else:
                 _text = translate_text(text)
             div.string = _text
