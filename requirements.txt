@@ -1,4 +1,5 @@
-langchain==0.1.0
+langchain==0.1.6
+langchain-community==0.0.19
 unstructured==0.11.8
 unstructured[docx]==0.11.8
 unstructured[md]==0.11.8
@@ -19,4 +20,4 @@ transformers==4.37.1
 bs4==0.0.2
 sentencepiece==0.1.99
 sacremoses==0.1.1
-starlette==4.9.0
+starlette
