@@ -97,7 +97,7 @@ def translate_html(pdf, html, llm, clientid, fn):
             lines.append(text + "====" + _text + "\n")
     with open(html, 'w', encoding='utf-8') as f:
         f.write(str(soup))
-    with open('log.txt', 'w') as f:
+    with open('log.txt', 'w', encoding='utf-8') as f:
         f.writelines(lines)
     print("翻译完成，生成文件：" + html)
     fn(clientid, "下载链接：" + html_url + clientid + ".html")
