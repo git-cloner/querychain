@@ -25,7 +25,7 @@ def load_trans_model():
 def translate_text(text):
     tokenized_text = tokenizer(
         text, return_tensors='pt', truncation=True, padding=True).to(device)
-    tokenized_text['repetition_penalty'] = 1.85
+    tokenized_text['repetition_penalty'] = 2.85
     translation = model.generate(**tokenized_text)
     translated_text = tokenizer.batch_decode(
         translation, skip_special_tokens=True)

@@ -49,10 +49,10 @@ python tools/model_download.py --repo_id shibing624/text2vec-base-chinese
 
 ```bash
 toos/pdf_trans.py有两处：
-1、base_url：指向大语言模型的服务地址，如http://172.16.62.137:8000/v1/
-2、html_url：客户端下载翻译后的html地址：如http://本机IP:8060/download/
+1、base_url：指向大语言模型的服务地址，如http://后台机器IP:8000/v1/
+2、html_url：客户端下载翻译后的html地址：如http://后台机器IP:8060/download/
 config.py
-openid_base_url:指向大语言模型的服务地址，如http://172.16.62.137:8000/v1
+openid_base_url:指向大语言模型的服务地址，如http://后台机器IP:8000/v1
 ```
 
 ### （2）客户端
