@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 from tools.pdf_trans import translate_pdf_html
 from starlette.responses import FileResponse
+import threading
 import asyncio
 import nest_asyncio
 nest_asyncio.apply()
@@ -34,6 +35,10 @@ async def index():
     return {"message": "local knowledge base"}
 
 
+def translate_pdf_html_bythread(pdf, html, llm, clientid, fn):
+    translate_pdf_html(pdf, html, llm, clientid, fn)
+
+
 @app.post("/upload")
 async def upload_file(clientid: str = Form(...), file: UploadFile = UploadFile(...)):
     upload_path = "./uploads"
@@ -44,8 +49,9 @@ async def upload_file(clientid: str = Form(...), file: UploadFile = UploadFile(.
         with open(fileName, 'wb') as buffer:
             shutil.copyfileobj(file.file, buffer)
         sendWebcketMsgSync(clientid, "上传完成")
-        translate_pdf_html(fileName, clientid + ".html",
-                           False, clientid, sendWebcketMsgSync)
+        t = threading.Thread(target=translate_pdf_html, args=(
+            fileName, clientid + ".html", False, clientid, sendWebcketMsgSync,))
+        t.start()
         return JSONResponse(content={"message": "File uploaded successfully", "filename": file.filename})
     except Exception as e:
         print(e)

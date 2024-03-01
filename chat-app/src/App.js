@@ -15,27 +15,14 @@ function App() {
   const { messages, appendMsg, setTyping, updateMsg } = useMessages([]);
   const [file, setFile] = useState("");
   const [showUpload, setShowUpload] = useState(false)
-  const [clientid, setClientid] = useState("");
 
   /* eslint-disable */
   function generateUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = Math.random() * 16 | 0,
-        v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
+    return Date.now().toString(36);
   }
 
   useEffect(() => {
-    const _clientid = generateUUID();
-    setClientid(_clientid);
-    const socket = new WebSocket(wsbase + _clientid);
-    socket.onmessage = function (event) {
-      updateMsg(_clientid, {
-        type: "text",
-        content: { text: event.data }
-      });
-    };
+
   }, []);
 
   async function chat_stream(prompt, _msgId) {
@@ -105,13 +92,25 @@ function App() {
         position: 'left',
       });
     } else {
+      const _clientid = generateUUID();
+      const socket = new WebSocket(wsbase + _clientid);
+      socket.onmessage = function (event) {
+        updateMsg(_clientid, {
+          type: "text",
+          content: { text: event.data }
+        });
+        if (event.data.indexOf("下载链接") != -1) {
+          socket.close();
+          console.log("file translated successfully")
+        }
+      };
       appendMsg({
-        _id: clientid,
+        _id: _clientid,
         type: 'text',
         content: { text: '开始上传文件' },
         position: 'left',
       });
-      uploadFile();
+      uploadFile(_clientid);
     }
   }
 
@@ -122,7 +121,7 @@ function App() {
     }
   }
 
-  async function uploadFile() {
+  async function uploadFile(clientid) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('clientid', clientid);
