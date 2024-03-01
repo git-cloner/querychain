@@ -63,7 +63,7 @@ def translate_html(pdf, html, llm, clientid, fn):
     divs = soup.find_all('div', class_="t")
     pbar = tqdm(total=len(divs))
     lines = []
-    special = [2, 17]
+    special = [17]
     for div in divs:
         pbar.update(1)
         if fn is not None:
